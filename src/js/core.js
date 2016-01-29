@@ -117,6 +117,8 @@ var defaults = {
     lazyLoadingInPrevNext: false,
     lazyLoadingInPrevNextAmount: 1,
     lazyLoadingOnTransitionStart: false,
+    // Lazy Painting
+    lazyPaintingInSlideAmount: 1,
     // Images
     preloadImages: true,
     updateOnImagesReady: true,
@@ -1775,6 +1777,14 @@ s.slideTo = function (slideIndex, speed, runCallbacks, internal) {
     if (typeof runCallbacks === 'undefined') runCallbacks = true;
     if (typeof slideIndex === 'undefined') slideIndex = 0;
     if (slideIndex < 0) slideIndex = 0;
+
+    for (var index = 0; index < s.slides.length; index++){
+        if (Math.abs(index - slideIndex) > s.params.lazyPaintingInSlideAmount)
+            $(s.slides[index]).addClass('lazy-painting-hide');
+        else
+            $(s.slides[index]).removeClass('lazy-painting-hide');
+    }
+
     s.snapIndex = Math.floor(slideIndex / s.params.slidesPerGroup);
     if (s.snapIndex >= s.snapGrid.length) s.snapIndex = s.snapGrid.length - 1;
 
