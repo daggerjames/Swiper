@@ -1779,10 +1779,29 @@ s.slideTo = function (slideIndex, speed, runCallbacks, internal) {
     if (slideIndex < 0) slideIndex = 0;
 
     for (var index = 0; index < s.slides.length; index++){
-        if (Math.abs(index - slideIndex) > s.params.lazyPaintingInSlideAmount)
-            $(s.slides[index]).addClass('lazy-painting-hide');
-        else
-            $(s.slides[index]).removeClass('lazy-painting-hide');
+        if (Math.abs(index - slideIndex) > s.params.lazyPaintingInSlideAmount){
+            //dynamic remove
+            if ($(s.slides[index]).children("div.Template").length > 0){
+                $(s.slides[index]).children("div.Template").remove();
+            }
+        }
+        else {
+            //lazyload
+            if ($(s.slides[index]).children("div.Template").length <= 0) {
+                $(s.slides[index]).append($("<div class='Template'></div>"));
+
+                var script = $(s.slides[index]).find("script[type='template']");
+                if (!script.attr("url")) {
+                    $(s.slides[index]).children("div.Template").html(script.html());
+                }
+                else{
+                    var _appendIndex = index;
+                    window.jQuery.get(script.attr("url"), {index: index}, function (rs) {
+                        $(s.slides[_appendIndex]).children("div.Template").html(rs);
+                    }, 'html');
+                }
+            }
+        }
     }
 
     s.snapIndex = Math.floor(slideIndex / s.params.slidesPerGroup);
